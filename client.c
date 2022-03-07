@@ -52,7 +52,7 @@ int recv_result(result** result_head, char* receive) {
 		cur->type = atoi(column_token);
 
 		switch (cur->type) {
-		case INT:
+		case _INT:
 			if ((cur->_int_data = (int*)malloc(sizeof(int) * result_count)) == NULL) {
 				strcpy(err_msg, "Memory Allocaiton Failed");
 
@@ -61,7 +61,7 @@ int recv_result(result** result_head, char* receive) {
 				return -1;
 			}
 			break;
-		case FLOAT:
+		case _FLOAT:
 			if ((cur->_float_data = (float*)malloc(sizeof(float) * result_count)) == NULL) {
 				strcpy(err_msg, "Memory Allocaiton Failed");
 
@@ -70,7 +70,7 @@ int recv_result(result** result_head, char* receive) {
 				return -1;
 			}
 			break;
-		case DOUBLE:
+		case _DOUBLE:
 			if ((cur->_double_data = (double*)malloc(sizeof(double) * result_count)) == NULL) {
 				strcpy(err_msg, "Memory Allocaiton Failed");
 
@@ -79,7 +79,7 @@ int recv_result(result** result_head, char* receive) {
 				return -1;
 			}
 			break;
-		case CHAR:
+		case _CHAR:
 			if ((cur->_char_data = (char*)malloc(sizeof(char) * result_count)) == NULL) {
 				strcpy(err_msg, "Memory Allocaiton Failed");
 
@@ -88,7 +88,7 @@ int recv_result(result** result_head, char* receive) {
 				return -1;
 			}
 			break;
-		case VARCHAR:
+		case _VARCHAR:
 			if ((cur->_string_data = (char**)malloc(sizeof(char*) * result_count)) == NULL) {
 				strcpy(err_msg, "Memory Allocaiton Failed");
 
@@ -131,7 +131,7 @@ int recv_result(result** result_head, char* receive) {
 			cur->type = atoi(column_token);
 
 			switch (cur->type) {
-			case INT:
+			case _INT:
 				if ((cur->_int_data = (int*)malloc(sizeof(int) * result_count)) == NULL) {
 					strcpy(err_msg, "Memory Allocaiton Failed");
 
@@ -140,7 +140,7 @@ int recv_result(result** result_head, char* receive) {
 					return -1;
 				}
 				break;
-			case FLOAT:
+			case _FLOAT:
 				if ((cur->_float_data = (float*)malloc(sizeof(float) * result_count)) == NULL) {
 					strcpy(err_msg, "Memory Allocaiton Failed");
 
@@ -149,7 +149,7 @@ int recv_result(result** result_head, char* receive) {
 					return -1;
 				}
 				break;
-			case DOUBLE:
+			case _DOUBLE:
 				if ((cur->_double_data = (double*)malloc(sizeof(double) * result_count)) == NULL) {
 					strcpy(err_msg, "Memory Allocaiton Failed");
 
@@ -158,7 +158,7 @@ int recv_result(result** result_head, char* receive) {
 					return -1;
 				}
 				break;
-			case CHAR:
+			case _CHAR:
 				if ((cur->_char_data = (char*)malloc(sizeof(char) * result_count)) == NULL) {
 					strcpy(err_msg, "Memory Allocaiton Failed");
 
@@ -167,7 +167,7 @@ int recv_result(result** result_head, char* receive) {
 					return -1;
 				}
 				break;
-			case VARCHAR:
+			case _VARCHAR:
 				if ((cur->_string_data = (char**)malloc(sizeof(char*) * result_count)) == NULL) {
 					strcpy(err_msg, "Memory Allocaiton Failed");
 
@@ -188,19 +188,19 @@ int recv_result(result** result_head, char* receive) {
 		data_token = strtok(column_remain, pad_seprator);
 		if (!strcmp(data_token, "NULL")) {
 			switch (cur->type) {
-			case INT:
+			case _INT:
 				cur->_int_data[0] = INT_MAX;
 				break;
-			case FLOAT:
+			case _FLOAT:
 				cur->_float_data[0] = FLT_MAX;
 				break;
-			case DOUBLE:
+			case _DOUBLE:
 				cur->_double_data[0] = DBL_MAX;
 				break;
-			case CHAR:
+			case _CHAR:
 				cur->_char_data[0] = pad;
 				break;
-			case VARCHAR:
+			case _VARCHAR:
 				if ((cur->_string_data[0] = (char*)malloc(2)) == NULL) {
 					strcpy(err_msg, "Memory Allocaiton Failed");
 
@@ -215,29 +215,29 @@ int recv_result(result** result_head, char* receive) {
 		}
 		else {
 			switch (cur->type) {
-			case INT:
+			case _INT:
 				cur->_int_data[0] = atoi(data_token);
 				break;
 
-			case FLOAT:
+			case _FLOAT:
 			{
 				char* pos = NULL;
 				cur->_float_data[0] = strtof(data_token, &pos);
 
 				break;
 			}
-			case DOUBLE:
+			case _DOUBLE:
 			{
 				char* pos = NULL;
 				cur->_double_data[0] = strtod(data_token, &pos);
 
 				break;
 			}
-			case CHAR:
+			case _CHAR:
 				cur->_char_data[0] = data_token[0];
 				break;
 
-			case VARCHAR:
+			case _VARCHAR:
 				if ((cur->_string_data[0] = (char*)malloc(strlen(data_token) + 1)) == NULL) {
 					strcpy(err_msg, "Memory Allocaiton Failed");
 
@@ -263,19 +263,19 @@ int recv_result(result** result_head, char* receive) {
 
 			if (!strcmp(data_token, "NULL")) {
 				switch (cur->type) {
-				case INT:
+				case _INT:
 					cur->_int_data[i] = INT_MAX;
 					break;
-				case FLOAT:
+				case _FLOAT:
 					cur->_float_data[i] = FLT_MAX;
 					break;
-				case DOUBLE:
+				case _DOUBLE:
 					cur->_double_data[i] = DBL_MAX;
 					break;
-				case CHAR:
+				case _CHAR:
 					cur->_char_data[i] = pad;
 					break;
-				case VARCHAR:
+				case _VARCHAR:
 					if ((cur->_string_data[i] = (char*)malloc(2)) == NULL) {
 						strcpy(err_msg, "Memory Allocaiton Failed");
 
@@ -290,29 +290,29 @@ int recv_result(result** result_head, char* receive) {
 			}
 			else {
 				switch (cur->type) {
-				case INT:
+				case _INT:
 					cur->_int_data[i] = atoi(data_token);
 					break;
 
-				case FLOAT:
+				case _FLOAT:
 				{
 					char* pos = NULL;
 					cur->_float_data[i] = strtof(data_token, &pos);
 
 					break;
 				}
-				case DOUBLE:
+				case _DOUBLE:
 				{
 					char* pos = NULL;
 					cur->_double_data[i] = strtod(data_token, &pos);
 
 					break;
 				}
-				case CHAR:
+				case _CHAR:
 					cur->_char_data[i] = data_token[0];
 					break;
 
-				case VARCHAR:
+				case _VARCHAR:
 					if ((cur->_string_data[i] = (char*)malloc(strlen(data_token) + 1)) == NULL) {
 						strcpy(err_msg, "Memory Allocaiton Failed");
 
@@ -342,7 +342,7 @@ result* find_result(result* result_head, char* column_name) {
 		else {
 			if (find->next == 0) {
 				strcpy(err_msg, "Find Column Not Found");
-				
+
 				return -1;
 			}
 			else
@@ -365,31 +365,31 @@ void result_print(result* result_head, int result_count) {
 		cur = result_head;
 		while (1) {
 			switch (cur->type) {
-			case INT:
+			case _INT:
 				if (int_is_null(cur->_int_data[i]))
 					printf("     (NULL)");
 				else
 					printf("     %d", cur->_int_data[i]);
 				break;
-			case FLOAT:
+			case _FLOAT:
 				if (float_is_null(cur->_float_data[i]))
 					printf("     (NULL)");
 				else
 					printf("     %.5f", cur->_float_data[i]);
 				break;
-			case DOUBLE:
+			case _DOUBLE:
 				if (double_is_null(cur->_double_data[i]))
 					printf("     (NULL)");
 				else
 					printf("     %.12lf", cur->_double_data[i]);
 				break;
-			case CHAR:
+			case _CHAR:
 				if (char_is_null(cur->_char_data[i]))
 					printf("     (NULL)");
 				else
 					printf("     %c", cur->_char_data[i]);
 				break;
-			case VARCHAR:
+			case _VARCHAR:
 				if (string_is_null(cur->_string_data[i]))
 					printf("     (NULL)");
 				else
@@ -442,23 +442,23 @@ void result_free(result* node, int result_count) {
 		if (node->name != 0)
 			free(node->name);
 		switch (node->type) {
-		case INT:
+		case _INT:
 			if (node->_int_data != 0)
 				free(node->_int_data);
 			break;
-		case FLOAT:
+		case _FLOAT:
 			if (node->_float_data != 0)
 				free(node->_float_data);
 			break;
-		case DOUBLE:
+		case _DOUBLE:
 			if (node->_double_data != 0)
 				free(node->_double_data);
 			break;
-		case CHAR:
+		case _CHAR:
 			if (node->_char_data != 0)
 				free(node->_char_data);
 			break;
-		case VARCHAR:
+		case _VARCHAR:
 			if (node->_string_data != 0) {
 				for (int i = 0; i < result_count; i++) {
 					if (node->_string_data[i] == 0)

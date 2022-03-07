@@ -1,16 +1,24 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
-#define INT 1
-#define FLOAT 2
-#define DOUBLE 3
-#define CHAR 4
-#define VARCHAR 5
+#define _INT 1
+#define _FLOAT 2
+#define _DOUBLE 3
+#define _CHAR 4
+#define _VARCHAR 5
 #define ERR_MSG_SIZE 51
+
+#define MENU_LENGTH 21
+#define DATE_LENGTH 11
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <float.h>
 #include <math.h>
+#include <windows.h>
+#include <time.h>
+#include <conio.h>
+
 //로컬
 
 typedef struct column {
@@ -51,8 +59,8 @@ char* select_result_str;   //로컬로 빠짐 (서버)
 //로컬
 
 int initalizing(char* file_name);
-int add_column(column tmp); 
-int _create(char* file_name, char* column_list);                    //테이블 이름 지정, 생성
+int add_column(column tmp);
+int _create(char* file_name, char* column_list);
 int _insert(char* values);
 int _delete(char* conditional);
 int _update(char* conditional, char* set);
