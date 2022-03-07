@@ -27,6 +27,9 @@
     <ClCompile Include="Result.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="function.c">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="local.h">
