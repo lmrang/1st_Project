@@ -875,7 +875,7 @@ int _update(char* conditional, char* set) {
 }
 int _select(char* conditional, char* select, char** result) {
 	char* _conditional = (char*)malloc(strlen(conditional) + 1);
-	char* conditional_name, * conditional_value;
+	char* conditional_name, * conditional_value = 0;
 	int conditional_index = -1;
 	column* conditional_column = 0;
 	char* _select = (char*)malloc(strlen(select) + 1);
@@ -889,37 +889,41 @@ int _select(char* conditional, char* select, char** result) {
 	strcpy(_conditional, conditional);
 	strcpy(_select, select);
 
-	conditional_name = strtok(_conditional, "= ");
-	conditional_value = strtok(NULL, "= \0");
 
-	while (1) {
-		if (!strcmp(cur->name, conditional_name)) {
-			if (cur->type == _CHAR || cur->type == _VARCHAR) {
-				if (cur->length < strlen(conditional_value) - 2 && strcmp(conditional_value, "NULL")) {
-					free(_conditional);
-					free(_select);
-					strcpy(err_msg, "Conditional Length Over");
-					return -1;
+	if (strcmp(conditional, "*") != 0) {
+		conditional_name = strtok(_conditional, "= ");
+		conditional_value = strtok(NULL, "= \0");
+
+		while (1) {
+			if (!strcmp(cur->name, conditional_name)) {
+				if (cur->type == _CHAR || cur->type == _VARCHAR) {
+					if (cur->length < strlen(conditional_value) - 2 && strcmp(conditional_value, "NULL")) {
+						free(_conditional);
+						free(_select);
+						strcpy(err_msg, "Conditional Length Over");
+						return -1;
+					}
+					else {
+						if (strcmp(conditional_value, "NULL"))
+							conditional_value = strtok(conditional_value, "'");
+					}
 				}
-				else {
-					if (strcmp(conditional_value, "NULL"))
-						conditional_value = strtok(conditional_value, "'");
-				}
+				conditional_column = cur;
+				break;
 			}
-			conditional_column = cur;
-			break;
+			if (cur->next != 0)
+				cur = cur->next;
+			else
+				break;
 		}
-		if (cur->next != 0)
-			cur = cur->next;
-		else
-			break;
+		if (conditional_column == 0) {
+			free(_conditional);
+			free(_select);
+			strcpy(err_msg, "Conditional Column Not Found");
+			return -1;
+		}
 	}
-	if (conditional_column == 0) {
-		free(_conditional);
-		free(_select);
-		strcpy(err_msg, "Conditional Column Not Found");
-		return -1;
-	}
+
 	for (unsigned int i = 0; i < strlen(_select); i++) {
 		if (_select[i] == ',')
 			select_count++;
@@ -965,7 +969,7 @@ int _select(char* conditional, char* select, char** result) {
 			}
 		}
 	}
-	{
+	if (strcmp(conditional, "*") != 0) {
 		int search_index = data_start_index;
 		int conditional_search_success = -1;
 		sdts_head = (sdts*)malloc(sizeof(sdts));
@@ -1190,6 +1194,127 @@ int _select(char* conditional, char* select, char** result) {
 			strcpy(err_msg, "Conditional Value Not Found");
 			return -1;
 		}
+	}
+
+	else {
+		int search_index = data_start_index;
+		char IS_NULL[5];
+		sdts* new_sdts;
+		sdts_head = (sdts*)malloc(sizeof(sdts));
+		sdts_head->str = 0;
+		sdts_head->next = 0;
+		sdts_tail = sdts_head;
+		F = fopen(_file_location, "r");
+		while (search_index < data_end_index) {
+			result_count++;
+			for (int i = 0; i < select_count; i++) {
+				strcpy(IS_NULL, "\0");
+				new_sdts = (sdts*)malloc(sizeof(sdts));
+				if (new_sdts == 0) {
+					free(_conditional);
+					free(_select);
+					free(select_column);
+					sdts_free(sdts_head);
+					fclose(F);
+					strcpy(err_msg, "Memory Allocaiton Failed");
+					return -1;
+				}
+				new_sdts->next = 0;
+				fseek(F, search_index + select_column[i]->start_index, SEEK_SET);
+				switch (select_column[i]->type) {
+				case _INT:
+				{
+					int i_token;
+					fread(IS_NULL, 4, 1, F);
+					IS_NULL[4] = '\0';
+					if (!strcmp(IS_NULL, "NULL")) {
+						new_sdts->str = (char*)malloc(5);
+						strcpy(new_sdts->str, "NULL");
+					}
+					else {
+						fseek(F, search_index + select_column[i]->start_index, SEEK_SET);
+						fread(&i_token, sizeof(int), 1, F);
+						new_sdts->str = (char*)malloc(11);
+						sprintf(new_sdts->str, "%d", i_token);
+					}
+					break;
+				}
+				case _FLOAT:
+				{
+					float f_token;
+					fread(IS_NULL, 4, 1, F);
+					IS_NULL[4] = '\0';
+					if (!strcmp(IS_NULL, "NULL")) {
+						new_sdts->str = (char*)malloc(5);
+						strcpy(new_sdts->str, "NULL");
+					}
+					else {
+						fseek(F, search_index + select_column[i]->start_index, SEEK_SET);
+						fread(&f_token, sizeof(float), 1, F);
+						new_sdts->str = (char*)malloc(31);
+						sprintf(new_sdts->str, "%.5f", f_token);
+
+					}
+					break;
+				}
+				case _DOUBLE:
+				{
+					double d_token;
+					fread(IS_NULL, 4, 1, F);
+					IS_NULL[4] = '\0';
+					if (!strcmp(IS_NULL, "NULL")) {
+						new_sdts->str = (char*)malloc(5);
+						strcpy(new_sdts->str, "NULL");
+					}
+					else {
+						fseek(F, search_index + select_column[i]->start_index, SEEK_SET);
+						fread(&d_token, sizeof(double), 1, F);
+						new_sdts->str = (char*)malloc(31);
+						sprintf(new_sdts->str, "%.12lf", d_token);
+					}
+					break;
+				}
+				case _CHAR:
+				{
+					IS_NULL[0] = fgetc(F);
+					if (IS_NULL[0] == pad) {
+						new_sdts->str = (char*)malloc(5);
+						strcpy(new_sdts->str, "NULL");
+					}
+					else {
+						fseek(F, search_index + select_column[i]->start_index, SEEK_SET);
+						new_sdts->str = (char*)malloc(2);
+						new_sdts->str[0] = fgetc(F);
+						new_sdts->str[1] = '\0';
+					}
+					break;
+
+				}
+				case _VARCHAR:
+				{
+					char* s_token;
+					IS_NULL[0] = fgetc(F);
+					if (IS_NULL[0] == pad) {
+						new_sdts->str = (char*)malloc(5);
+						strcpy(new_sdts->str, "NULL");
+					}
+					else {
+						fseek(F, search_index + select_column[i]->start_index, SEEK_SET);
+						s_token = (char*)malloc((select_column[i]->length) + 1);
+						fread(s_token, select_column[i]->length, 1, F);
+						s_token = strtok(s_token, pad_seprator);
+						new_sdts->str = (char*)malloc(strlen(s_token) + 1);
+						strcpy(new_sdts->str, s_token);
+					}
+					break;
+				}
+				}
+				sdts_tail->next = new_sdts;
+				sdts_tail = new_sdts;
+			}
+			search_index += data_line_length;
+		}
+
 	}
 
 	{
