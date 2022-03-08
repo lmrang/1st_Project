@@ -251,79 +251,80 @@ int recv_result(result** result_head, char* receive) {
 
 			}
 		}
+		{
+			int i = 0;
+			while ((data_token = strtok(NULL, pad_seprator)) != NULL) {
+				if (cur->next == 0) {
+					cur = *result_head;
+					i++;
+				}
+				else
+					cur = cur->next;
 
-		while ((data_token = strtok(NULL, pad_seprator)) != NULL) {
-			static int i = 0;
-			if (cur->next == 0) {
-				cur = *result_head;
-				i++;
-			}
-			else
-				cur = cur->next;
+				if (!strcmp(data_token, "NULL")) {
+					switch (cur->type) {
+					case _INT:
+						cur->_int_data[i] = INT_MAX;
+						break;
+					case _FLOAT:
+						cur->_float_data[i] = FLT_MAX;
+						break;
+					case _DOUBLE:
+						cur->_double_data[i] = DBL_MAX;
+						break;
+					case _CHAR:
+						cur->_char_data[i] = pad;
+						break;
+					case _VARCHAR:
+						if ((cur->_string_data[i] = (char*)malloc(2)) == NULL) {
+							strcpy(err_msg, "Memory Allocaiton Failed");
 
-			if (!strcmp(data_token, "NULL")) {
-				switch (cur->type) {
-				case _INT:
-					cur->_int_data[i] = INT_MAX;
-					break;
-				case _FLOAT:
-					cur->_float_data[i] = FLT_MAX;
-					break;
-				case _DOUBLE:
-					cur->_double_data[i] = DBL_MAX;
-					break;
-				case _CHAR:
-					cur->_char_data[i] = pad;
-					break;
-				case _VARCHAR:
-					if ((cur->_string_data[i] = (char*)malloc(2)) == NULL) {
-						strcpy(err_msg, "Memory Allocaiton Failed");
+							free(recv);
+							result_free(*result_head, result_count);
 
-						free(recv);
-						result_free(*result_head, result_count);
-
-						return -1;
+							return -1;
+						}
+						strcpy(cur->_string_data[i], pad_seprator);
+						break;
 					}
-					strcpy(cur->_string_data[i], pad_seprator);
-					break;
 				}
-			}
-			else {
-				switch (cur->type) {
-				case _INT:
-					cur->_int_data[i] = atoi(data_token);
-					break;
+				else {
+					switch (cur->type) {
+					case _INT:
+						cur->_int_data[i] = atoi(data_token);
+						break;
 
-				case _FLOAT:
-				{
-					char* pos = NULL;
-					cur->_float_data[i] = strtof(data_token, &pos);
+					case _FLOAT:
+					{
+						char* pos = NULL;
+						cur->_float_data[i] = strtof(data_token, &pos);
 
-					break;
-				}
-				case _DOUBLE:
-				{
-					char* pos = NULL;
-					cur->_double_data[i] = strtod(data_token, &pos);
-
-					break;
-				}
-				case _CHAR:
-					cur->_char_data[i] = data_token[0];
-					break;
-
-				case _VARCHAR:
-					if ((cur->_string_data[i] = (char*)malloc(strlen(data_token) + 1)) == NULL) {
-						strcpy(err_msg, "Memory Allocaiton Failed");
-
-						free(recv);
-						result_free(*result_head, result_count);
-
-						return -1;
+						break;
 					}
-					strcpy(cur->_string_data[i], data_token);
-					break;
+					case _DOUBLE:
+					{
+						char* pos = NULL;
+						cur->_double_data[i] = strtod(data_token, &pos);
 
+						break;
+					}
+					case _CHAR:
+						cur->_char_data[i] = data_token[0];
+						break;
+
+					case _VARCHAR:
+						if ((cur->_string_data[i] = (char*)malloc(strlen(data_token) + 1)) == NULL) {
+							strcpy(err_msg, "Memory Allocaiton Failed");
+
+							free(recv);
+							result_free(*result_head, result_count);
+
+							return -1;
+						}
+						strcpy(cur->_string_data[i], data_token);
+						break;
+
+					}
 				}
 			}
 		}

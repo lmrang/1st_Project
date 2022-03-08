@@ -337,7 +337,7 @@ int _insert(char* values) {
 			continue;
 		}
 		if (ptr[index] == '\0') {
-			ptr = strtok(ptr, "'");
+			ptr = strtok(ptr, "' ");
 			if (IS_STRING == 2) {
 				if (ptr[0] == ' ')
 					ptr = strtok(NULL, "'");
