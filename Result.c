@@ -6,17 +6,18 @@ void P_use(){
 	char* values;
 	int r_count;
 	result* _result;   //연결리스트
-	char choose[10];
+	char choose[10] = "\0";
 	char conditional[20]="WorkNumber=";
 	char set[20] = "RNumber=";
 	//char* choose="\0";
-	char* input;
+	char input[15];
 	int i;
 
+	void Find_choose(result * result_head, int result_count);
 	
     /********************************************************************************************/
 
-	if (initalizing("D:\\c\\알고리즘\\Project\\Result") == -1) {
+	if (initalizing("Result") == -1) {
 		printf("%s", err_msg);
 		file_column_free();
 		return -1;
@@ -31,13 +32,14 @@ void P_use(){
 	r_count=recv_result(&_result, select_result_str);
 	result_print(_result, r_count);
 
-	//scanf("%d", &i);
-	//strcpy(choose,Find_choose(_result, i));    //글자찾고
-	//strcpy(choose, make_work_sen(&choose));		//set 만들기
-	//printf("%s", choose);
-	//strcat(conditional, choose);
+	i=select_task(_result, r_count);
+
+	printf("%d", i);
+	Find_choose(_result, i, &choose);
+	printf("%s", choose);
+	make_work_sen(&choose);
+	printf("%s", choose);
 	//file_column_free();
-	select_task(_result, r_count);
 	/********************************************************************************************/
 	/*자재사용테이블*/
 	/*if (initalizing("D:\\c\\알고리즘\\Project\\PUse") == -1) {
@@ -102,17 +104,17 @@ int select_task(result* _result, int count) {
 		printf("%s", menu[i]);
 	}
 
-	Menu_select("WorkNumber\n======================\n", menu[0], "\n", count);
-
+	i=Menu_select("WorkNumber\n======================\n", menu, "\n", count);
+	return i;
 	free(menu);
 }
 
-int Find_choose(result* result_head, int result_count) {
+void Find_choose(result* result_head, int result_count, char* choose) {
 	result* cur;
-	char choose[20]="\0";
+	//char choose[20]="\0";
 	for (int i = 0; i < result_count; i++) {
 		cur = result_head;
-		//printf("%d", i);
+		//printf("%d", result_count);
 		while (1) {
 			switch (cur->type) {
 			case _INT:
@@ -145,7 +147,7 @@ int Find_choose(result* result_head, int result_count) {
 				if (string_is_null(cur->_string_data[i]))
 					strcpy(choose, "(NULL)");
 				else {
-					strcpy(choose,cur->_string_data[i]);
+					strcpy(choose,cur->_string_data[i]);				
 				}
 				break;
 			}
@@ -153,7 +155,6 @@ int Find_choose(result* result_head, int result_count) {
 		}
 		printf("\n");
 	}
-	return choose;
 }
 
 int make_work_sen(char *choose) {
@@ -161,23 +162,7 @@ int make_work_sen(char *choose) {
 	strcpy(CON, "'");
 	strcat(CON, choose);
 	strcat(CON, "'");
-	return CON;
-}
-
-char Time() {                                 //현재시간구하기
-	time_t t = time(NULL);
-	struct tm tm = *localtime(&t);
-	char MTime[20];
-	char Time[5];
-
-	sprintf(Time, "%d", tm.tm_year + 1900);
-	strcpy(MTime, Time);
-	strcat(MTime, "/");
-	sprintf(Time, "%d", tm.tm_mon + 1);
-	strcat(MTime, Time);
-	strcat(MTime, "/");
-	sprintf(Time, "%d", tm.tm_mday);
-	strcat(MTime, Time);
+	strcpy(choose, CON);
 }
 
 void input_values(char* values) {  //사용수량 입력

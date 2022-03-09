@@ -136,7 +136,7 @@ int Input_string(char* result, int str_size, int kor, int eng, int num, int sign
 		}
 	}
 }
-int Menu_select(char* pre_input, char menu[][MENU_LENGTH], char* aft_input, int menu_count) {
+int Menu_select(char* pre_input, char** menu, char* aft_input, int menu_count) {
 	int input_char;
 	int select = 1;
 	CONSOLE_CURSOR_INFO cursorInfo = { 1, };
