@@ -1354,6 +1354,7 @@ int _select(char* conditional, char* select, char** result) {
 	}
 
 	sdts_free(sdts_head);
+
 	free(_conditional);
 	free(_select);
 	free(select_column);
