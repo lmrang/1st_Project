@@ -1,11 +1,18 @@
 #include "local.h"
 
 int main() {
-	
-	P_use();
-	//_create("Work", "WorkNumber VARCHAR(20) OrderDate VARCHAR(20) DueDate INT OrderCount INT Status VARCHAR(10)");
-	//_create("Result", "WorkNumber VARCHAR(20) RNumber VARCHAR(20)");
-	//_create("Product", "PNumber VARCHAR(20) PName VARCHAR(20) PUnit VARCHAR(20)");
+	int i;
+
+	while (1) {
+	i = P_menu_select();
+
+	if (i == 1) P_use();
+	if (i == 2) P_update();
+	if (i == 3) P_delete();
+	if (i == 4) P_view();
+	if (i == 5) break;
+	}
+	//_create("PUse", "Check_Num INT WorkNumber VARCHAR(10) RNumber VARCHAR(10) SNumber VARCHAR(10) SName VARCHAR(10) Unit VARCHAR(10) UseDate VARCHAR(20) UseCount INT");
 
 	/*if (initalizing("D:\\c\\알고리즘\\Project\\product_table") == -1) {
 		if (_create("product_table", "PNumber VARCHAR(10) PName VARCHAR(20) PUnit VARCHAR(10)") == -1)
@@ -13,8 +20,5 @@ int main() {
 		file_column_free();
 		return -1;
 	}*/
-
-	//if (_create("PUse", "WorkNumber VARCHAR(10) RNumber VARCHAR(10) UseDate VARCHAR(10) SNumber VARCHAR(10) SName VARCHAR(10) Unit VARCHAR(10) UseCount VARCHAR(10)") == -1)
-
 	return 0;
 }
