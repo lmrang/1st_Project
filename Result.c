@@ -77,14 +77,14 @@ void P_use(){
 	/*******************************************************************************************/
 	
 	/*자재테이블*/
-	if (initalizing("D:\\c\\알고리즘\\Project\\product_table") == -1) {
+	if (initalizing("product_table") == -1) {
 		if (_create("product_table", "PNumber VARCHAR(10) PName VARCHAR(20) PUnit VARCHAR(10)") == -1)
 			printf("%s", err_msg);
 		file_column_free();
 		return -1;
 	}
 
-	if (_select("PType=3", "PNumber, PName, PUnit", &select_result_str) == -1) {
+	if (_select("PType=3", "PNumber, PName, PUnit", &select_result_str) == -1) {                    //type=3 자재만 출력
 		printf("%s\n", err_msg);
 		file_column_free();
 		return -1;
@@ -92,10 +92,9 @@ void P_use(){
 	
 	r_count = recv_result(&_result, select_result_str);
 	i = select_task(_result, r_count, 45 , 0);
-	select_num = 3;
+	select_num = 4;
 	Find_choose(_result, i, &choose, select_num);           //conditional 만들기
 	strcat(conditional, choose);
-	//printf("%s\n", conditional);
 	file_column_free();
 	
 	/*******************************************************************************************/
@@ -115,7 +114,7 @@ void P_use(){
 	//printf("%s\n", conditional);
 	/*******************************************************************************************/
 	/*자재사용테이블*/
-	if (initalizing("D:\\c\\알고리즘\\Project\\PUse") == -1) {
+	if (initalizing("PUse") == -1) {
 		if (_create("PUse", "Check_Num INT WorkNumber VARCHAR(10) RNumber VARCHAR(10) SNumber VARCHAR(10) SName VARCHAR(10) Unit VARCHAR(10) UseDate VARCHAR(10) UseCount INT") == -1)
 			printf("%s", err_msg);
 		file_column_free();
@@ -211,11 +210,14 @@ int select_task(result* _result, int count, int x, int y) {
 	}
 
 	i=Menu_select("\0", menu, "\n", count, x, y);
+	/*for (i = 0; i < count; i++) {
+		free(menu[i]);
+	}*/
 	free(menu);
 	return i;
 }
 
-void Find_choose(result* result_head, int result_count, char* choose, int select_num) {
+ void Find_choose(result* result_head, int result_count, char* choose, int select_num) {
 	result* cur;
 	int cur_num;
 	char copy[40]="\0";
@@ -329,7 +331,7 @@ void P_update() {
 		return -1;
 	}
 	r_count = recv_result(&_result, select_result_str);
-	i = select_task(_result, r_count, 6, 0);
+	i = select_task(_result, r_count, 25, 0);
 	if (_select("*", "Check_Num", &select_result_str) == -1) {
 		printf("%s\n", err_msg);
 		file_column_free();
@@ -349,7 +351,7 @@ void P_update() {
 	menu[0] = "UseDate 변경";
 	menu[1] = "UseCount 변경";
 
-	select = Menu_select("\0", menu, "\0", menu_num);
+	select = Menu_select("\0", menu, "\0", menu_num, 80, 0);
 	free(menu);
 	/****************************************************************************/
 	if (select == 1) {                //UseDate 변경
@@ -396,7 +398,7 @@ void P_delete() {
 	char CheckNum[20] = "Check_Num= ";
 
 
-	if (initalizing("D:\\c\\알고리즘\\Project\\PUse") == -1) {
+	if (initalizing("PUse") == -1) {
 		printf("%s", err_msg);
 		file_column_free();
 		return -1;
@@ -407,7 +409,7 @@ void P_delete() {
 		return -1;
 	}
 	r_count = recv_result(&_result, select_result_str);
-	i = select_task(_result, r_count, 6, 0);
+	i = select_task(_result, r_count, 25, 0);
 
 	if (_select("*", "Check_Num", &select_result_str) == -1) {
 		printf("%s\n", err_msg);
@@ -425,6 +427,8 @@ void P_delete() {
 		file_column_free();
 		return -1;
 	}
+
+	system("cls");
 	printf("삭제가 완료되었습니다.\n");
 	_getch();
 	file_column_free();

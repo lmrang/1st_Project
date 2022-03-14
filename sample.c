@@ -4,6 +4,7 @@ int main() {
 	int i;
 
 	while (1) {
+	system("cls");
 	i = P_menu_select();
 
 	if (i == 1) P_use();
