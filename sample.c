@@ -11,15 +11,31 @@ int main() {
 	if (i == 2) P_update();
 	if (i == 3) P_delete();
 	if (i == 4) P_view();
-	if (i == 5) break;
+	if (i == 5) management_view();
+	if (i == 6) break;
 	}
-	//_create("PUse", "Check_Num INT WorkNumber VARCHAR(10) RNumber VARCHAR(10) SNumber VARCHAR(10) SName VARCHAR(10) Unit VARCHAR(10) UseDate VARCHAR(20) UseCount INT");
 
-	/*if (initalizing("D:\\c\\알고리즘\\Project\\product_table") == -1) {
-		if (_create("product_table", "PNumber VARCHAR(10) PName VARCHAR(20) PUnit VARCHAR(10)") == -1)
-			printf("%s", err_msg);
+	/*if (_create("PCount", "RNumber VARCHAR(10) RName VARCHAR(10) UseCount INT PUnit VARCHAR(10)") == -1) {
+		printf("%s", err_msg);
 		file_column_free();
 		return -1;
-	}*/
+	}
+
+	if (initalizing("PCount") == -1) {
+		printf("%s", err_msg);
+		file_column_free();
+		return -1;
+	}
+	_insert("'M0001', '막대', 100, 'EA'");
+	_insert("'M0002', '우유', 1000, 'mL'");
+	_insert("'M0003', '멜론시럽', 500, 'mL'");
+	_insert("'M0004', '멜론색소', 100, 'g'");
+	_insert("'M0005', '딸기원액', 100, 'mL'");
+	_insert("'M0006', '설탕', 1000, 'g'");
+	_insert("'M0007', '초코칩', 500, 'g'");
+	_insert("'M0008', '초콜릿', 700, 'g'");
+
+	print_data();*/
+
 	return 0;
 }

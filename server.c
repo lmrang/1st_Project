@@ -71,7 +71,7 @@ int initalizing(char* file_name) {
 				free(tmp.name);
 				return -1;
 			}
-			//free(tmp.name);
+			free(tmp.name);
 			break;
 		}
 		count++;

@@ -9,27 +9,33 @@ void make_conditional(char* choose);
 void P_view(); 
 void P_update();
 void P_delete();
+void num_management(result* result_head, int num);
+void management_view();
 
 int check_num = 0;
 
 int P_menu_select() {
 	int select, i;
-	int menu_num = 5;
+	int menu_num = 6;
 	char** menu;
 
 	menu = (char*)malloc(sizeof(char*) * menu_num);
 
 	for (i = 0; i < menu_num; i++) {
-		menu[i] = (char*)malloc(sizeof(char) * 10);
+		menu[i] = (char*)malloc(sizeof(char) * 50);
 	}
 
 	menu[0] = "자재사용등록";
 	menu[1] = "자재사용등록 변경";
 	menu[2] = "자재사용내역 삭제";
 	menu[3] = "자재사용조회";
-	menu[4] = "뒤로가기";
+	menu[4] = "재고현황조회";
+	menu[5] = "뒤로가기";
 
 	select = Menu_select("\0", menu, "\0", menu_num, 0, 0);
+
+	//free(menu[0]);
+
 	free(menu);
 	return select;
 }
@@ -95,7 +101,7 @@ void P_use(){
 	select_num = 4;
 	Find_choose(_result, i, &choose, select_num);           //conditional 만들기
 	strcat(conditional, choose);
-	file_column_free();
+	
 	
 	/*******************************************************************************************/
 	gotoxy(70, 0);
@@ -104,14 +110,15 @@ void P_use(){
 	make_conditional(&date, 1);                   //usedate set만들기
 	strcat(conditional, date);
 
-	gotoxy(70, 1);
+	/*gotoxy(70, 1);
 	printf("UseCount : ");
 	scanf("%d", &use_num);
 	sprintf(use, "%d", use_num);
-	strcat(conditional, use);
-	printf("\n\n");
+	strcat(conditional, use);*/
+	file_column_free();
 
-	//printf("%s\n", conditional);
+	num_management(_result, i, &use);
+	strcat(conditional, use);
 	/*******************************************************************************************/
 	/*자재사용테이블*/
 	if (initalizing("PUse") == -1) {
@@ -144,7 +151,7 @@ int select_task(result* _result, int count, int x, int y) {
 	menu = (char*)malloc(sizeof(char*) * count);
 	
 	for (i = 0; i < count; i++) {
-		menu[i] = (char*)malloc(sizeof(char) * 10);
+		menu[i] = (char*)malloc(sizeof(char) * 100);
 	}
 
 	for (i = 0; i < count; i++) {
@@ -217,7 +224,7 @@ int select_task(result* _result, int count, int x, int y) {
 	return i;
 }
 
- void Find_choose(result* result_head, int result_count, char* choose, int select_num) {
+void Find_choose(result* result_head, int result_count, char* choose, int select_num) {
 	result* cur;
 	int cur_num;
 	char copy[40]="\0";
@@ -320,7 +327,7 @@ void P_update() {
 	char CheckNum[20] = "Check_Num= ";
 	char choose[30] = "\0";
 
-	if (initalizing("D:\\c\\알고리즘\\Project\\PUse") == -1) {
+	if (initalizing("PUse") == -1) {
 		printf("%s", err_msg);
 		file_column_free();
 		return -1;
@@ -332,6 +339,14 @@ void P_update() {
 	}
 	r_count = recv_result(&_result, select_result_str);
 	i = select_task(_result, r_count, 25, 0);
+	file_column_free();
+
+	if (initalizing("PUse") == -1) {
+		printf("%s", err_msg);
+		file_column_free();
+		return -1;
+	}
+
 	if (_select("*", "Check_Num", &select_result_str) == -1) {
 		printf("%s\n", err_msg);
 		file_column_free();
@@ -346,7 +361,7 @@ void P_update() {
 	printf("변경 선택\n");
 	menu = (char*)malloc(sizeof(char*) * menu_num);
 	for (i = 0; i < menu_num; i++) {
-		menu[i] = (char*)malloc(sizeof(char) * 10);
+		menu[i] = (char*)malloc(sizeof(char) * 100);
 	}
 	menu[0] = "UseDate 변경";
 	menu[1] = "UseCount 변경";
@@ -354,7 +369,8 @@ void P_update() {
 	select = Menu_select("\0", menu, "\0", menu_num, 80, 0);
 	free(menu);
 	/****************************************************************************/
-	if (select == 1) {                //UseDate 변경
+	if (select == 1) {   //UseDate 변경
+		gotoxy(100, 0);
 		printf("UseDate : ");
 		Input_date(update_input, 1);
 		make_conditional(&update_input, 0);                   //usedate set만들기
@@ -371,7 +387,8 @@ void P_update() {
 		//_getch();
 	}
 	/***************************************************************************/
-	if (select == 2) {                //UseCount 변경
+	if (select == 2) {    //UseCount 변경
+		gotoxy(100, 0);
 		printf("UseCount : ");
 		scanf("%s", update_input);
 		strcat(UseCount, update_input);
@@ -410,6 +427,13 @@ void P_delete() {
 	}
 	r_count = recv_result(&_result, select_result_str);
 	i = select_task(_result, r_count, 25, 0);
+	file_column_free();
+
+	if (initalizing("PUse") == -1) {
+		printf("%s", err_msg);
+		file_column_free();
+		return -1;
+	}
 
 	if (_select("*", "Check_Num", &select_result_str) == -1) {
 		printf("%s\n", err_msg);
@@ -432,4 +456,118 @@ void P_delete() {
 	printf("삭제가 완료되었습니다.\n");
 	_getch();
 	file_column_free();
+}
+
+void num_management(result* result_head, int num, char *use) {
+	result* _result;   //연결리스트
+	char conditional[50] = "RNumber='";
+	char count[20] = "UseCount=";
+	int point = 0;
+	result* cur;
+	int r_count;
+	int use_num=0;
+	char c_use_num[20] = "\0";
+
+	for (int i = 0; i < num; i++) {
+		cur = result_head;
+
+		while (1) {
+			switch (cur->type) {
+			case _VARCHAR:
+				if (string_is_null(cur->_string_data[i]))
+					strcat(conditional, "(NULL)");
+				else {
+					if (point == 0) {
+						strcat(conditional, cur->_string_data[i]);
+						material_choose(conditional);
+						strcat(conditional, "'");
+						point++;
+					}
+				}
+				break;
+			}
+			if (cur->next == 0) {
+				break;
+			}
+			else {
+				cur = cur->next;
+			}
+		}
+	}
+	gotoxy(70, 1);
+	printf("UseCount : ");
+	scanf("%d", &use_num);
+	sprintf(use, "%d", use_num);
+
+	if (initalizing("PCount") == -1) {
+		if (_create("PCount", "RNumber VARCHAR(10) RName VARCHAR(10) UseCount INT PUnit VARCHAR(10)") == -1)
+			printf("%s", err_msg);
+		file_column_free();
+		return -1;
+	}
+
+	if (_select(conditional, "UseCount", &select_result_str) == -1) {
+		printf("%s\n", err_msg);
+		file_column_free();
+		return -1;
+	}
+	r_count = recv_result(&_result, select_result_str);
+
+	for (int i = 0; i < r_count; i++) {
+		cur = _result;
+		while (1) {
+			switch (cur->type) {
+			case _INT:
+				if (int_is_null(cur->_int_data[i]))
+					printf("     (NULL)");
+				else {
+					point = cur->_int_data[i];
+				}
+				break;
+			}
+			if (cur->next == 0) {
+				break;
+			}
+			else {
+				cur = cur->next;
+			}
+		}
+	}
+
+	use_num = point - use_num;
+	sprintf(c_use_num, "%d", use_num);
+	strcat(count, c_use_num);
+	file_column_free();
+
+	/*******************************************************************************************/
+	if (initalizing("PCount") == -1) {
+		if (_create("PCount", "RNumber VARCHAR(10) RName VARCHAR(10) UseCount INT PUnit VARCHAR(10)") == -1)
+			printf("%s", err_msg);
+		file_column_free();
+		return -1;
+	}
+	if (_update(conditional, count) == -1) {
+		printf("%s\n", err_msg);
+
+		file_column_free();
+		return -1;
+	}
+}
+
+void management_view() {
+	char a;
+
+	if (initalizing("PCount") == -1) {
+		printf("%s", err_msg);
+		file_column_free();
+		return -1;
+	}
+
+	print_data();
+	file_column_free();
+	a = _getch();
+}
+
+int material_choose(char conditional) {
+	//글자비교함수
 }
