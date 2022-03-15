@@ -467,6 +467,8 @@ void num_management(result* result_head, int num, char *use) {
 	int r_count;
 	int use_num=0;
 	char c_use_num[20] = "\0";
+	int material_num = 0;
+	char copy[20];
 
 	for (int i = 0; i < num; i++) {
 		cur = result_head;
@@ -477,21 +479,19 @@ void num_management(result* result_head, int num, char *use) {
 				if (string_is_null(cur->_string_data[i]))
 					strcat(conditional, "(NULL)");
 				else {
-					if (point == 0) {
-						strcat(conditional, cur->_string_data[i]);
-						material_choose(conditional);
-						strcat(conditional, "'");
-						point++;
-					}
+					strcpy(copy, cur->_string_data[i]);
+					material_num = material_choose(copy);
 				}
-				break;
 			}
-			if (cur->next == 0) {
-				break;
-			}
-			else {
-				cur = cur->next;
-			}
+			break;
+		}
+		if (cur->next == 0) {
+			strcat(conditional, copy);
+			strcat(conditional, "'");
+			break;
+		}
+		else {
+			cur = cur->next;
 		}
 	}
 	gotoxy(70, 1);
@@ -518,12 +518,14 @@ void num_management(result* result_head, int num, char *use) {
 		while (1) {
 			switch (cur->type) {
 			case _INT:
-				if (int_is_null(cur->_int_data[i]))
-					printf("     (NULL)");
-				else {
-					point = cur->_int_data[i];
+				if (i == material_num) {
+					if (int_is_null(cur->_int_data[i]))
+						printf("     (NULL)");
+					else {
+						point = cur->_int_data[i];
+					}
+					break;
 				}
-				break;
 			}
 			if (cur->next == 0) {
 				break;
@@ -569,5 +571,14 @@ void management_view() {
 }
 
 int material_choose(char conditional) {
-	//글자비교함수
+	//글자비교함수.............이렇게 되면 정렬되어 있어야한다는 전제조건이 생겨버리는데,.......
+	if (strcmp(conditional, "M0001")) return 1;
+	if (strcmp(conditional, "M0002")) return 2;
+	if (strcmp(conditional, "M0003")) return 3;
+	if (strcmp(conditional, "M0004")) return 4;
+	if (strcmp(conditional, "M0005")) return 5;
+	if (strcmp(conditional, "M0006")) return 6;
+	if (strcmp(conditional, "M0007")) return 7;
+	if (strcmp(conditional, "M0008")) return 8;
+	if (strcmp(conditional, "M0009")) return 9;
 }
