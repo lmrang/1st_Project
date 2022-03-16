@@ -6,11 +6,13 @@ void P_use();
 int select_task();
 void Find_choose(result* result_head, int result_count, int select_num);
 void make_conditional(char* choose);
-void P_view(); 
+void P_view();
 void P_update();
 void P_delete();
 void num_management(result* result_head, int num);
 void management_view();
+void del_num_management(result* result_head, int num);
+void update_num_management(int update, int num);
 
 int check_num = 0;
 
@@ -25,14 +27,15 @@ int P_menu_select() {
 		menu[i] = (char*)malloc(sizeof(char) * 50);
 	}
 
-	menu[0] = "ÀÚÀç»ç¿ëµî·Ï";
-	menu[1] = "ÀÚÀç»ç¿ëµî·Ï º¯°æ";
-	menu[2] = "ÀÚÀç»ç¿ë³»¿ª »èÁ¦";
-	menu[3] = "ÀÚÀç»ç¿ëÁ¶È¸";
-	menu[4] = "Àç°íÇöÈ²Á¶È¸";
-	menu[5] = "µÚ·Î°¡±â";
-
-	select = Menu_select("\0", menu, "\0", menu_num, 0, 0);
+	menu[0] = "ìì¬ì‚¬ìš©ë“±ë¡";
+	menu[1] = "ìì¬ì‚¬ìš©ë“±ë¡ ë³€ê²½";
+	menu[2] = "ìì¬ì‚¬ìš©ë‚´ì—­ ì‚­ì œ";
+	menu[3] = "ìì¬ì‚¬ìš©ì¡°íšŒ";
+	menu[4] = "ì¬ê³ í˜„í™©ì¡°íšŒ";
+	menu[5] = "ë’¤ë¡œê°€ê¸°";
+	printf("      ë©”ë‰´ì„ íƒ    \n");
+	printf("====================");
+	select = Menu_select("\0", menu, "\0", menu_num, 0, 2);
 
 	//free(menu[0]);
 
@@ -40,49 +43,53 @@ int P_menu_select() {
 	return select;
 }
 
-void P_use(){
+void P_use() {
 	int i;
 	char check[10];
 	char* values;
 	int use_num;
-	char use[10]="\0";
+	char use[10] = "\0";
 	int r_count;
-	int select_num=0;
-	result* _result;   //¿¬°á¸®½ºÆ®
+	int select_num = 0;
+	result* _result;   //ì—°ê²°ë¦¬ìŠ¤íŠ¸
 	char choose[30] = "\0";
 	char WorkNumber[30] = "WorkNumber=";
-	char date[DATE_LENGTH+5];
-	char conditional[70]="\0";
+	char date[DATE_LENGTH + 5];
+	char conditional[70] = "\0";
 	char result[30] = "\0";
 	/********************************************************************************************/
 	check_num++;
 	sprintf(check, "%d", check_num);
 	strcpy(conditional, check);
 	strcat(conditional, ", ");
-    /********************************************************************************************/
+	/********************************************************************************************/
 	if (initalizing("Result") == -1) {
 		printf("%s", err_msg);
 		file_column_free();
 		return -1;
 	}
-	
-	if (_select("*","WorkNumber, RNumber", &select_result_str) == -1) {                 //ÀÛ¾÷Áö½Ã ¹øÈ£ ¼±ÅÃ
+
+	if (_select("*", "WorkNumber, RNumber", &select_result_str) == -1) {                 //ì‘ì—…ì§€ì‹œ ë²ˆí˜¸ ì„ íƒ
 		printf("%s\n", err_msg);
 		file_column_free();
-			return -1;
+		return -1;
 	}
 	select_num = 5;
-	r_count=recv_result(&_result, select_result_str);
-	i=select_task(_result, r_count, 25, 0);
+	r_count = recv_result(&_result, select_result_str);
+	gotoxy(21, 0);
+	printf("ì‘ì—…ì§€ì‹œë²ˆí˜¸  ì‘ì—…ì‹¤ì ë²ˆí˜¸\n");
+	gotoxy(21, 1);
+	printf("==========================");
+	i = select_task(_result, r_count, 25, 2);
 
-	Find_choose(_result, i, &choose, select_num);           //conditional ¸¸µé±â
+	Find_choose(_result, i, &choose, select_num);           //conditional ë§Œë“¤ê¸°
 	strcat(conditional, choose);
 	strcpy(result, choose);
 	file_column_free();
 
 	/*******************************************************************************************/
-	
-	/*ÀÚÀçÅ×ÀÌºí*/
+
+	/*ìì¬í…Œì´ë¸”*/
 	if (initalizing("product_table") == -1) {
 		if (_create("product_table", "PNumber VARCHAR(10) PName VARCHAR(20) PUnit VARCHAR(10)") == -1)
 			printf("%s", err_msg);
@@ -90,24 +97,28 @@ void P_use(){
 		return -1;
 	}
 
-	if (_select("PType=3", "PNumber, PName, PUnit", &select_result_str) == -1) {                    //type=3 ÀÚÀç¸¸ Ãâ·Â
+	if (_select("PType=3", "PNumber, PName, PUnit", &select_result_str) == -1) {                    //type=3 ìì¬ë§Œ ì¶œë ¥, BOMì—°ê²° í•„ìš”!
 		printf("%s\n", err_msg);
 		file_column_free();
 		return -1;
 	}
-	
+
 	r_count = recv_result(&_result, select_result_str);
-	i = select_task(_result, r_count, 45 , 0);
+	gotoxy(48, 0);
+	printf("  í’ˆë²ˆ     í’ˆëª…   ë‹¨ìœ„\n");
+	gotoxy(48, 1);
+	printf("======================");
+	i = select_task(_result, r_count, 48, 2);
 	select_num = 4;
-	Find_choose(_result, i, &choose, select_num);           //conditional ¸¸µé±â
+	Find_choose(_result, i, &choose, select_num);           //conditional ë§Œë“¤ê¸°
 	strcat(conditional, choose);
-	
-	
+
+
 	/*******************************************************************************************/
-	gotoxy(70, 0);
+	gotoxy(77, 0);
 	printf("UseDate : ");
 	Input_date(date, 1);
-	make_conditional(&date, 1);                   //usedate set¸¸µé±â
+	make_conditional(&date, 1);                   //usedate setë§Œë“¤ê¸°
 	strcat(conditional, date);
 
 	/*gotoxy(70, 1);
@@ -120,7 +131,7 @@ void P_use(){
 	num_management(_result, i, &use);
 	strcat(conditional, use);
 	/*******************************************************************************************/
-	/*ÀÚÀç»ç¿ëÅ×ÀÌºí*/
+	/*ìì¬ì‚¬ìš©í…Œì´ë¸”*/
 	if (initalizing("PUse") == -1) {
 		if (_create("PUse", "Check_Num INT WorkNumber VARCHAR(10) RNumber VARCHAR(10) SNumber VARCHAR(10) SName VARCHAR(10) Unit VARCHAR(10) UseDate VARCHAR(10) UseCount INT") == -1)
 			printf("%s", err_msg);
@@ -135,8 +146,8 @@ void P_use(){
 	}
 
 	system("cls");
-	printf("µî·ÏÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù.\n\n");
-	print_data();
+	printf("ë“±ë¡ì´ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.\n\n");
+	//print_data();
 	_getch();
 	file_column_free();
 
@@ -149,7 +160,7 @@ int select_task(result* _result, int count, int x, int y) {
 	char** menu;
 	result* cur;
 	menu = (char*)malloc(sizeof(char*) * count);
-	
+
 	for (i = 0; i < count; i++) {
 		menu[i] = (char*)malloc(sizeof(char) * 100);
 	}
@@ -192,7 +203,7 @@ int select_task(result* _result, int count, int x, int y) {
 						strcat(menu[i], "   ");
 					}
 					break;
-					
+
 
 				case _VARCHAR:
 					if (string_is_null(cur->_string_data[i]))
@@ -216,7 +227,7 @@ int select_task(result* _result, int count, int x, int y) {
 		}
 	}
 
-	i=Menu_select("\0", menu, "\n", count, x, y);
+	i = Menu_select("\0", menu, "\n", count, x, y);
 	/*for (i = 0; i < count; i++) {
 		free(menu[i]);
 	}*/
@@ -227,7 +238,7 @@ int select_task(result* _result, int count, int x, int y) {
 void Find_choose(result* result_head, int result_count, char* choose, int select_num) {
 	result* cur;
 	int cur_num;
-	char copy[40]="\0";
+	char copy[40] = "\0";
 	for (int i = 0; i < result_count; i++) {
 		cur = result_head;
 		cur_num = 0;
@@ -291,7 +302,7 @@ void make_conditional(char* choose, int select_num) {
 	strcat(CON, "'");
 	strcat(CON, choose);
 	//printf("%d, %d\n", i, select_num);
-	if (select_num==0) {
+	if (select_num == 0) {
 		strcat(CON, "'");
 	}
 
@@ -302,9 +313,9 @@ void make_conditional(char* choose, int select_num) {
 void P_view() {
 	char a;
 	int r_count;
-	result* _result;   //¿¬°á¸®½ºÆ®
+	result* _result;   //ì—°ê²°ë¦¬ìŠ¤íŠ¸
 
-	if (initalizing("D:\\c\\¾Ë°í¸®Áò\\Project\\PUse") == -1) {
+	if (initalizing("D:\\c\\ì•Œê³ ë¦¬ì¦˜\\Project\\PUse") == -1) {
 		printf("%s", err_msg);
 		file_column_free();
 		return -1;
@@ -312,15 +323,16 @@ void P_view() {
 
 	print_data();
 	file_column_free();
-	a=_getch();
+	a = _getch();
 }
 
 void P_update() {
 	int r_count;
-	result* _result;   //¿¬°á¸®½ºÆ®
-	int select, i, colum_num;
+	result* _result;   //ì—°ê²°ë¦¬ìŠ¤íŠ¸
+	int select, i, colum_num, j;
 	int menu_num = 2;
 	char** menu;
+	int update = 0;
 	char update_input[20];
 	char UseDate[30] = "UseDate=";
 	char UseCount[20] = "UseCount=";
@@ -338,7 +350,11 @@ void P_update() {
 		return -1;
 	}
 	r_count = recv_result(&_result, select_result_str);
-	i = select_task(_result, r_count, 25, 0);
+	gotoxy(24, 0);
+	printf("ì§€ì‹œë²ˆí˜¸ ì‹¤ì ë²ˆí˜¸  í’ˆë²ˆ   í’ˆëª…   ë‹¨ìœ„   ë“±ë¡ì¼  ì‚¬ìš©ê°¯ìˆ˜\n");
+	gotoxy(22, 1);
+	printf("=============================================================");
+	i = select_task(_result, r_count, 25, 2);
 	file_column_free();
 
 	if (initalizing("PUse") == -1) {
@@ -354,26 +370,26 @@ void P_update() {
 	}
 	r_count = recv_result(&_result, select_result_str);
 	colum_num = 1;
-	Find_choose(_result, i, &choose, colum_num);           //conditional ¸¸µé±â
+	Find_choose(_result, i, &choose, colum_num);           //conditional ë§Œë“¤ê¸°
 	strcat(CheckNum, choose);
-	
+
 	/****************************************************************************/
-	printf("º¯°æ ¼±ÅÃ\n");
+	//printf("ë³€ê²½ ì„ íƒ\n");
 	menu = (char*)malloc(sizeof(char*) * menu_num);
-	for (i = 0; i < menu_num; i++) {
-		menu[i] = (char*)malloc(sizeof(char) * 100);
+	for (j = 0; j < menu_num; j++) {
+		menu[j] = (char*)malloc(sizeof(char) * 100);
 	}
-	menu[0] = "UseDate º¯°æ";
-	menu[1] = "UseCount º¯°æ";
+	menu[0] = "UseDate ë³€ê²½";
+	menu[1] = "UseCount ë³€ê²½";
 
 	select = Menu_select("\0", menu, "\0", menu_num, 80, 0);
 	free(menu);
 	/****************************************************************************/
-	if (select == 1) {   //UseDate º¯°æ
+	if (select == 1) {   //UseDate ë³€ê²½
 		gotoxy(100, 0);
 		printf("UseDate : ");
 		Input_date(update_input, 1);
-		make_conditional(&update_input, 0);                   //usedate set¸¸µé±â
+		make_conditional(&update_input, 0);                   //usedate setë§Œë“¤ê¸°
 		strcat(UseDate, update_input);
 
 		if (_update(CheckNum, UseDate) == -1) {
@@ -383,15 +399,24 @@ void P_update() {
 			return -1;
 		}
 
-		printf("UseDate º¯°æÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù.\n");
+		printf("UseDate ë³€ê²½ì´ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.\n");
 		//_getch();
 	}
 	/***************************************************************************/
-	if (select == 2) {    //UseCount º¯°æ
+	if (select == 2) {    //UseCount ë³€ê²½
 		gotoxy(100, 0);
 		printf("UseCount : ");
-		scanf("%s", update_input);
+		scanf("%d", &update);
+		sprintf(update_input, "%d", update);;
 		strcat(UseCount, update_input);
+
+		update_num_management(update, i);
+
+		if (initalizing("PUse") == -1) {
+			printf("%s", err_msg);
+			file_column_free();
+			return -1;
+		}
 
 		if (_update(CheckNum, UseCount) == -1) {
 			printf("%s\n", err_msg);
@@ -399,9 +424,7 @@ void P_update() {
 			file_column_free();
 			return -1;
 		}
-
-		printf("UseCount º¯°æÀÌ ¿Ï·áµÇ¾ú½À´Ï´Ù.\n");
-		//_getch();
+		printf("UseCount ë³€ê²½ì´ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.\n");
 	}
 	print_data();
 	_getch();
@@ -410,7 +433,7 @@ void P_update() {
 
 void P_delete() {
 	int r_count, i, colum_num;
-	result* _result;   //¿¬°á¸®½ºÆ®
+	result* _result;   //ì—°ê²°ë¦¬ìŠ¤íŠ¸
 	char choose[30] = "\0";
 	char CheckNum[20] = "Check_Num= ";
 
@@ -426,9 +449,29 @@ void P_delete() {
 		return -1;
 	}
 	r_count = recv_result(&_result, select_result_str);
-	i = select_task(_result, r_count, 25, 0);
+	gotoxy(24, 0);
+	printf("ì§€ì‹œë²ˆí˜¸ ì‹¤ì ë²ˆí˜¸  í’ˆë²ˆ   í’ˆëª…   ë‹¨ìœ„   ë“±ë¡ì¼  ì‚¬ìš©ê°¯ìˆ˜\n");
+	gotoxy(22, 1);
+	printf("=============================================================");
+	i = select_task(_result, r_count, 25, 2);
 	file_column_free();
 
+	/******************************************************************************************************/
+	if (initalizing("PUse") == -1) {
+		printf("%s", err_msg);
+		file_column_free();
+		return -1;
+	}
+
+	if (_select("*", "SNumber", &select_result_str) == -1) {
+		printf("%s\n", err_msg);
+		file_column_free();
+		return -1;
+	}
+	r_count = recv_result(&_result, select_result_str);
+	file_column_free();
+	del_num_management(_result, i);
+	/******************************************************************************************************/
 	if (initalizing("PUse") == -1) {
 		printf("%s", err_msg);
 		file_column_free();
@@ -442,33 +485,34 @@ void P_delete() {
 	}
 	r_count = recv_result(&_result, select_result_str);
 	colum_num = 1;
-	Find_choose(_result, i, &choose, colum_num);           //conditional ¸¸µé±â
+	Find_choose(_result, i, &choose, colum_num);           //conditional ë§Œë“¤ê¸°
 	strcat(CheckNum, choose);
 
-	if (_delete(CheckNum) == -1) {
+	if (_delete(CheckNum) == -1) {							//ì‚­ì œ
 		printf("%s\n", err_msg);
 
 		file_column_free();
 		return -1;
 	}
-
-	system("cls");
-	printf("»èÁ¦°¡ ¿Ï·áµÇ¾ú½À´Ï´Ù.\n");
-	_getch();
 	file_column_free();
+	/******************************************************************************************************/
+	system("cls");
+	printf("ì‚­ì œê°€ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.\n");
+	_getch();
 }
 
-void num_management(result* result_head, int num, char *use) {
-	result* _result;   //¿¬°á¸®½ºÆ®
+void num_management(result* result_head, int num, char* use) {     //ë“±ë¡ì‹œ ìì¬ìˆ˜ëŸ‰í…Œì´ë¸” ì‚­ê°
+	result* _result;   //ì—°ê²°ë¦¬ìŠ¤íŠ¸
 	char conditional[50] = "RNumber='";
 	char count[20] = "UseCount=";
 	int point = 0;
 	result* cur;
 	int r_count;
-	int use_num=0;
+	int use_num = 0;
 	char c_use_num[20] = "\0";
-	int material_num = 0;
 	char copy[20];
+	int material;
+	int material_check = 0;
 
 	for (int i = 0; i < num; i++) {
 		cur = result_head;
@@ -479,22 +523,26 @@ void num_management(result* result_head, int num, char *use) {
 				if (string_is_null(cur->_string_data[i]))
 					strcat(conditional, "(NULL)");
 				else {
-					strcpy(copy, cur->_string_data[i]);
-					material_num = material_choose(copy);
+					if (point == 0 && i == num - 1) {
+						strcpy(copy, cur->_string_data[i]);
+						material = material_choose(copy);
+						point++;
+					}
 				}
+				break;
 			}
-			break;
-		}
-		if (cur->next == 0) {
-			strcat(conditional, copy);
-			strcat(conditional, "'");
-			break;
-		}
-		else {
-			cur = cur->next;
+			if (cur->next == 0) {
+				break;
+			}
+			else {
+				cur = cur->next;
+			}
 		}
 	}
-	gotoxy(70, 1);
+	strcat(conditional, copy);
+	strcat(conditional, "'");
+
+	gotoxy(77, 1);
 	printf("UseCount : ");
 	scanf("%d", &use_num);
 	sprintf(use, "%d", use_num);
@@ -518,12 +566,10 @@ void num_management(result* result_head, int num, char *use) {
 		while (1) {
 			switch (cur->type) {
 			case _INT:
-				if (i == material_num) {
-					if (int_is_null(cur->_int_data[i]))
-						printf("     (NULL)");
-					else {
-						point = cur->_int_data[i];
-					}
+				if (int_is_null(cur->_int_data[i]))
+					printf("     (NULL)");
+				else {
+					point = cur->_int_data[i];
 					break;
 				}
 			}
@@ -535,7 +581,6 @@ void num_management(result* result_head, int num, char *use) {
 			}
 		}
 	}
-
 	use_num = point - use_num;
 	sprintf(c_use_num, "%d", use_num);
 	strcat(count, c_use_num);
@@ -554,6 +599,299 @@ void num_management(result* result_head, int num, char *use) {
 		file_column_free();
 		return -1;
 	}
+	file_column_free();
+}
+
+void del_num_management(result* result_head, int num) {			//ì‚­ì œ ì‹œ ì¬ê³  ìˆ˜ëŸ‰ ë³µêµ¬
+	result* cur;
+	result* _result;
+	char U_conditional[50] = "SNumber='";
+	char conditional[50] = "RNumber='";
+	char count[20] = "UseCount=";
+	int point = 0;
+	int U_point = 0, C_point = 0;
+	char copy[20] = "\0";
+	int material = 0, r_count = 0;
+	char use_num[20] = "\0";
+
+	for (int i = 0; i < num; i++) {
+		cur = result_head;
+
+		while (1) {
+			switch (cur->type) {
+			case _VARCHAR:
+				if (string_is_null(cur->_string_data[i]))
+					strcat(conditional, "(NULL)");
+				else {
+					if (point == 0 && i == num - 1) {
+						strcpy(copy, cur->_string_data[i]);
+						material = material_choose(copy);
+						point++;
+					}
+				}
+				break;
+			}
+			if (cur->next == 0) {
+				break;
+			}
+			else {
+				cur = cur->next;
+			}
+		}
+	}
+	strcat(U_conditional, copy);			//PNumber
+	strcat(U_conditional, "'");
+
+	strcat(conditional, copy);
+	strcat(conditional, "'");
+	/*******************************************************************************************/
+	if (initalizing("PUse") == -1) {
+		if (_create("PCount", "RNumber VARCHAR(10) RName VARCHAR(10) UseCount INT PUnit VARCHAR(10)") == -1)
+			printf("%s", err_msg);
+		file_column_free();
+		return -1;
+	}
+
+	if (_select(U_conditional, "UseCount", &select_result_str) == -1) {
+		printf("%s\n", err_msg);
+		file_column_free();
+		return -1;
+	}
+	r_count = recv_result(&_result, select_result_str);
+
+	for (int i = 0; i < r_count; i++) {
+		cur = _result;
+		while (1) {
+			switch (cur->type) {
+			case _INT:
+				if (int_is_null(cur->_int_data[i]))
+					printf("     (NULL)");
+				else {
+					U_point = cur->_int_data[i];
+					break;
+				}
+			}
+			if (cur->next == 0) {
+				break;
+			}
+			else {
+				cur = cur->next;
+			}
+		}
+	}
+	file_column_free();
+	/*******************************************************************************************/
+	if (initalizing("PCount") == -1) {
+		if (_create("PCount", "RNumber VARCHAR(10) RName VARCHAR(10) UseCount INT PUnit VARCHAR(10)") == -1)
+			printf("%s", err_msg);
+		file_column_free();
+		return -1;
+	}
+
+	if (_select(conditional, "UseCount", &select_result_str) == -1) {
+		printf("%s\n", err_msg);
+		file_column_free();
+		return -1;
+	}
+	r_count = recv_result(&_result, select_result_str);
+
+	for (int i = 0; i < r_count; i++) {
+		cur = _result;
+		while (1) {
+			switch (cur->type) {
+			case _INT:
+				if (int_is_null(cur->_int_data[i]))
+					printf("     (NULL)");
+				else {
+					C_point = cur->_int_data[i];
+					break;
+				}
+			}
+			if (cur->next == 0) {
+				break;
+			}
+			else {
+				cur = cur->next;
+			}
+		}
+	}
+	file_column_free();
+
+	C_point += U_point;
+	sprintf(use_num, "%d", C_point);
+	strcat(count, use_num);
+	/**************************************************************************************************/
+	if (initalizing("PCount") == -1) {
+		if (_create("PCount", "RNumber VARCHAR(10) RName VARCHAR(10) UseCount INT PUnit VARCHAR(10)") == -1)
+			printf("%s", err_msg);
+		file_column_free();
+		return -1;
+	}
+
+	if (_update(conditional, count) == -1) {
+		printf("%s\n", err_msg);
+
+		file_column_free();
+		return -1;
+	}
+
+	file_column_free();
+}
+
+void update_num_management(int update, int num) {
+	result* cur;
+	result* _result;
+	char U_conditional[50] = "SNumber='";
+	char conditional[50] = "RNumber='";
+	char count[50] = "UseCount=";
+	int point = 0;
+	int U_point = 0, C_point = 0;
+	char copy[20] = "\0";
+	int material = 0, r_count = 0;
+	char use_num[20] = "\0";
+
+	/*************************************************************************/
+	if (initalizing("PUse") == -1) {
+		printf("%s", err_msg);
+		file_column_free();
+		return -1;
+	}
+
+	if (_select("*", "SNumber", &select_result_str) == -1) {
+		printf("%s\n", err_msg);
+		file_column_free();
+		return -1;
+	}
+	r_count = recv_result(&_result, select_result_str);
+	file_column_free();
+
+	for (int i = 0; i < num; i++) {
+		cur = _result;
+
+		while (1) {
+			switch (cur->type) {
+			case _VARCHAR:
+				if (string_is_null(cur->_string_data[i]))
+					strcat(conditional, "(NULL)");
+				else {
+					if (point == 0 && i == num - 1) {
+						strcpy(copy, cur->_string_data[i]);
+						material = material_choose(copy);
+						point++;
+					}
+				}
+				break;
+			}
+			if (cur->next == 0) {
+				break;
+			}
+			else {
+				cur = cur->next;
+			}
+		}
+	}
+
+	strcat(U_conditional, copy);			//PNumber
+	strcat(U_conditional, "'");
+
+	strcat(conditional, copy);
+	strcat(conditional, "'");
+
+	/*******************************************************************************************/
+	if (initalizing("PUse") == -1) {
+		if (_create("PCount", "RNumber VARCHAR(10) RName VARCHAR(10) UseCount INT PUnit VARCHAR(10)") == -1)
+			printf("%s", err_msg);
+		file_column_free();
+		return -1;
+	}
+
+	if (_select(U_conditional, "UseCount", &select_result_str) == -1) {
+		printf("%s\n", err_msg);
+		file_column_free();
+		return -1;
+	}
+	r_count = recv_result(&_result, select_result_str);
+
+	for (int i = 0; i < r_count; i++) {
+		cur = _result;
+		while (1) {
+			switch (cur->type) {
+			case _INT:
+				if (int_is_null(cur->_int_data[i]))
+					printf("     (NULL)");
+				else {
+					U_point = cur->_int_data[i];
+					printf("%d", U_point);
+					break;
+				}
+			}
+			if (cur->next == 0) {
+				break;
+			}
+			else {
+				cur = cur->next;
+			}
+		}
+	}
+	file_column_free();
+
+	/*******************************************************************************************/
+	if (initalizing("PCount") == -1) {
+		if (_create("PCount", "RNumber VARCHAR(10) RName VARCHAR(10) UseCount INT PUnit VARCHAR(10)") == -1)
+			printf("%s", err_msg);
+		file_column_free();
+		return -1;
+	}
+
+	if (_select(conditional, "UseCount", &select_result_str) == -1) {
+		printf("%s\n", err_msg);
+		file_column_free();
+		return -1;
+	}
+	r_count = recv_result(&_result, select_result_str);
+
+	for (int i = 0; i < r_count; i++) {
+		cur = _result;
+		while (1) {
+			switch (cur->type) {
+			case _INT:
+				if (int_is_null(cur->_int_data[i]))
+					printf("     (NULL)");
+				else {
+					C_point = cur->_int_data[i];
+					break;
+				}
+			}
+			if (cur->next == 0) {
+				break;
+			}
+			else {
+				cur = cur->next;
+			}
+		}
+	}
+	file_column_free();
+
+	C_point += U_point;
+	C_point -= update;
+	sprintf(use_num, "%d", C_point);
+	strcat(count, use_num);
+	/*******************************************************************************************************/
+	if (initalizing("PCount") == -1) {
+		if (_create("PCount", "RNumber VARCHAR(10) RName VARCHAR(10) UseCount INT PUnit VARCHAR(10)") == -1)
+			printf("%s", err_msg);
+		file_column_free();
+		return -1;
+	}
+
+	if (_update(conditional, count) == -1) {
+		printf("%s\n", err_msg);
+
+		file_column_free();
+		return -1;
+	}
+
+	file_column_free();
 }
 
 void management_view() {
@@ -570,15 +908,15 @@ void management_view() {
 	a = _getch();
 }
 
-int material_choose(char conditional) {
-	//±ÛÀÚºñ±³ÇÔ¼ö.............ÀÌ·¸°Ô µÇ¸é Á¤·ÄµÇ¾î ÀÖ¾î¾ßÇÑ´Ù´Â ÀüÁ¦Á¶°ÇÀÌ »ı°Ü¹ö¸®´Âµ¥,.......
-	if (strcmp(conditional, "M0001")) return 1;
-	if (strcmp(conditional, "M0002")) return 2;
-	if (strcmp(conditional, "M0003")) return 3;
-	if (strcmp(conditional, "M0004")) return 4;
-	if (strcmp(conditional, "M0005")) return 5;
-	if (strcmp(conditional, "M0006")) return 6;
-	if (strcmp(conditional, "M0007")) return 7;
-	if (strcmp(conditional, "M0008")) return 8;
-	if (strcmp(conditional, "M0009")) return 9;
+int material_choose(char conditional[]) {
+	//ê¸€ìë¹„êµí•¨ìˆ˜........... ì •ë ¬ë˜ì–´ ìˆì–´ì•¼ í•œë‹¤ëŠ” ë‹¨ì ì´ ìˆë‹¤.
+	if (strcmp(conditional, "M0001") == 0) return 1;
+	if (strcmp(conditional, "M0002") == 0) return 2;
+	if (strcmp(conditional, "M0003") == 0) return 3;
+	if (strcmp(conditional, "M0004") == 0) return 4;
+	if (strcmp(conditional, "M0005") == 0) return 5;
+	if (strcmp(conditional, "M0006") == 0) return 6;
+	if (strcmp(conditional, "M0007") == 0) return 7;
+	if (strcmp(conditional, "M0008") == 0) return 8;
+	if (strcmp(conditional, "M0009") == 0) return 9;
 }
