@@ -49,9 +49,11 @@ void P_use() {
 	char* values;
 	int use_num;
 	char use[10] = "\0";
-	int r_count;
+	int r_count, m_r_count, s_r_count;
 	int select_num = 0;
 	result* _result;   //연결리스트
+	result* S_result;
+	result* M_result;
 	char choose[30] = "\0";
 	char WorkNumber[30] = "WorkNumber=";
 	char date[DATE_LENGTH + 5];
@@ -96,14 +98,14 @@ void P_use() {
 		file_column_free();
 		return -1;
 	}
-
+	
 	if (_select("PType=3", "PNumber, PName, PUnit", &select_result_str) == -1) {                    //type=3 자재만 출력, BOM연결 필요!
 		printf("%s\n", err_msg);
 		file_column_free();
 		return -1;
 	}
-
 	r_count = recv_result(&_result, select_result_str);
+	
 	gotoxy(48, 0);
 	printf("  품번     품명   단위\n");
 	gotoxy(48, 1);
@@ -121,14 +123,9 @@ void P_use() {
 	make_conditional(&date, 1);                   //usedate set만들기
 	strcat(conditional, date);
 
-	/*gotoxy(70, 1);
-	printf("UseCount : ");
-	scanf("%d", &use_num);
-	sprintf(use, "%d", use_num);
-	strcat(conditional, use);*/
 	file_column_free();
 
-	num_management(_result, i, &use);
+	num_management(_result, i, &use);                   //재고 수량 변경 함수
 	strcat(conditional, use);
 	/*******************************************************************************************/
 	/*자재사용테이블*/
@@ -147,7 +144,7 @@ void P_use() {
 
 	system("cls");
 	printf("등록이 완료되었습니다.\n\n");
-	//print_data();
+    print_data();
 	_getch();
 	file_column_free();
 
@@ -155,6 +152,7 @@ void P_use() {
 }
 
 int select_task(result* _result, int count, int x, int y) {
+	//연결리스트를 이중포인터로 만들어서 Menu_select함수에 바로 연결된 함수
 	char cur_int_data[10];
 	int i, j;
 	char** menu;
@@ -236,6 +234,7 @@ int select_task(result* _result, int count, int x, int y) {
 }
 
 void Find_choose(result* result_head, int result_count, char* choose, int select_num) {
+	//해당되는 글자를 찾아주는 함수
 	result* cur;
 	int cur_num;
 	char copy[40] = "\0";
@@ -293,11 +292,11 @@ void Find_choose(result* result_head, int result_count, char* choose, int select
 				cur_num++;
 			}
 		}
-		//printf("\n");
 	}
 }
 
 void make_conditional(char* choose, int select_num) {
+	//conditional 조건에 맞게 변경
 	char CON[30] = "\0";
 	strcat(CON, "'");
 	strcat(CON, choose);
@@ -372,6 +371,7 @@ void P_update() {
 	colum_num = 1;
 	Find_choose(_result, i, &choose, colum_num);           //conditional 만들기
 	strcat(CheckNum, choose);
+	file_column_free();
 
 	/****************************************************************************/
 	//printf("변경 선택\n");
@@ -392,14 +392,21 @@ void P_update() {
 		make_conditional(&update_input, 0);                   //usedate set만들기
 		strcat(UseDate, update_input);
 
+		if (initalizing("PUse") == -1) {
+			printf("%s", err_msg);
+			file_column_free();
+			return -1;
+		}
+
 		if (_update(CheckNum, UseDate) == -1) {
 			printf("%s\n", err_msg);
 
 			file_column_free();
 			return -1;
 		}
-
+		system("cls");
 		printf("UseDate 변경이 완료되었습니다.\n");
+		file_column_free();
 		//_getch();
 	}
 	/***************************************************************************/
@@ -424,6 +431,7 @@ void P_update() {
 			file_column_free();
 			return -1;
 		}
+		system("cls");
 		printf("UseCount 변경이 완료되었습니다.\n");
 	}
 	print_data();
@@ -757,7 +765,7 @@ void update_num_management(int update, int num) {
 		return -1;
 	}
 
-	if (_select("*", "SNumber", &select_result_str) == -1) {
+	if (_select("*", "SNumber", &select_result_str) == -1) {  
 		printf("%s\n", err_msg);
 		file_column_free();
 		return -1;
